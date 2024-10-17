@@ -3,7 +3,8 @@ var router = express.Router();
 
 // gọi model
 var model_product = require('../models/product');
-
+const JWT = require('jsonwebtoken');
+const config = require("../untils/configENV");
 // Thêm sản phẩm
 router.post('/add', async (req, res) => {
     try {
@@ -17,8 +18,32 @@ router.post('/add', async (req, res) => {
 });
 
 // Hiển thị lấy danh sách sản phẩm
+/**
+ * @swagger
+ * /san-pham/list:
+ *   get:
+ *     summary: Lấy danh sách sản phẩm
+ *     responses:
+ *       200:
+ *         description: Trả về danh sách sản phẩm
+ *       400:
+ *         description: Thất bại
+ */
 router.get('/list', async (req, res) => {
     try {
+        const token = req.header("Authorization").split(' ')[1];
+        if(token){
+            JWT.verify(token, config.SECRETKEY, async function (err, id){
+              if(err){
+                res.status(403).json({"status": 403, "err": err});
+              }else{
+                const list = await model_product.find().populate('category', 'name');
+                res.status(200).json({ status: true, data: list });
+              }
+            });
+          }else{
+            res.status(401).json({"status": 401});
+          }
         const list = await model_product.find().populate('category', 'name');
         res.status(200).json({ status: true, data: list });
     } catch (e) {
@@ -30,6 +55,19 @@ router.get('/list', async (req, res) => {
 // - Lấy toàn bộ danh sách sản phẩm
 router.get('/getAll', async (req, res) => {
     try {
+        const token = req.header("Authorization").split(' ')[1];
+        if(token){
+            JWT.verify(token, config.SECRETKEY, async function (err, id){
+              if(err){
+                res.status(403).json({"status": 403, "err": err});
+              }else{
+                const list = await model_product.find();
+                res.status(200).json({ status: true, message: "Tìm thành công", data: list });
+              }
+            });
+          }else{
+            res.status(401).json({"status": 401});
+          }
         const list = await model_product.find();
         res.status(200).json({ status: true, message: "Tìm thành công", data: list });
     } catch (e) {
@@ -40,6 +78,19 @@ router.get('/getAll', async (req, res) => {
 // - Lấy toàn bộ danh sách sản phẩm thuộc loại "xxx" ( với xxx là do người dùng truyền vào)
 router.get('/getCate', async (req, res) => {
     try {
+        const token = req.header("Authorization").split(' ')[1];
+        if(token){
+            JWT.verify(token, config.SECRETKEY, async function (err, id){
+              if(err){
+                res.status(403).json({"status": 403, "err": err});
+              }else{
+                const list = await model_product.find({ category: cateId });
+                res.status(200).json({ status: true, message: "Tìm thành công", data: list });
+              }
+            });
+          }else{
+            res.status(401).json({"status": 401});
+          }
         const { cateId } = req.query;
         const list = await model_product.find({ category: cateId });
         res.status(200).json({ status: true, message: "Tìm thành công", data: list });

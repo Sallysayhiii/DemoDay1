@@ -5,10 +5,11 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 const mongoose = require('mongoose');
-// require('./models/category');
-// require('./models/product');
+require('./models/category');
+require('./models/product');
 require('./models/Lab3_models/category_lab3');
 require('./models/Lab3_models/product_lab3');
+require('./models/user')
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -18,6 +19,12 @@ var categoryRouter = require('./routes/category');
 var routerCategory = require('./routes/Lab3/routerCategory');
 var routerProduct = require('./routes/Lab3/routerProduct');
 var app = express();
+
+
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('./untils/configSwagger');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
